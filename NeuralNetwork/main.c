@@ -6,8 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-
-#include "../csv_parser/csv.h"
+#include "mnist_csv.h"
 
 typedef struct _neuron {
 	float* values;
@@ -31,61 +30,9 @@ typedef struct {
 	layer_t layers;
 } neuralnetwork_t;
 
-typedef struct {
-	uint8_t label;
-	float data[28 * 28];
-} mnist_data_t;
-
-typedef struct {
-	FILE* fp;
-	const char* filename;
-}csvparser_t;
-
 static const char* filename_train = "dataset/mnist_train.csv";
 
-static uint8_t csvparser_init(csvparser_t* parser, const char* filename) {
-	parser->fp = fopen(filename, "r");
-	parser->filename = filename;
-
-	if (parser->fp == NULL) {
-		printf("Read file error\r\n");
-
-		return -1;
-	}
-
-	return 1;
-}
-
-static uint8_t parse_mnist_line(csvparser_t* parser ,mnist_data_t* out) {
-	uint16_t done = 0, err = 0;
-
-	char* mnist_line = fread_csv_line(parser->fp, 16384, &done, &err);
-	mnist_data_t out_mnist;
-
-	char** parsed = parse_csv(mnist_line);
-
-	free(mnist_line);
-
-	if (!(*parsed)) return -1;
-
-	out->label = atoi(parsed[0]);
-
-	for (uint16_t i = 0; i < (28 * 28); i++) {
-		out->data[i] = (float)atoi(parsed[i + 1]) / 255.f;
-	}
-
-	free_csv_line(parsed);
-
-	return 1;
-}
-
-static void parse_mnist(csvparser_t* parser, mnist_data_t* out, uint16_t size) {
-	for (uint16_t i = 0; i < size; i++) {
-		parse_mnist_line(parser, &out[i]);
-	}
-
-	return;
-}
+csvparser_t parser;
 
 static void activation_relu(float input, float* output) {
 	*output = input > 0.f ? input : 0.f;
@@ -94,7 +41,7 @@ static void activation_relu(float input, float* output) {
 }
 
 static void activation_sigmoid(float input, float* output) {
-	*output = (1.0 / (1.0 + expf(input)));
+	*output = (1.0f / (1.0f + expf(input)));
 
 	return;
 }
@@ -318,7 +265,7 @@ float neuralnetwork_calculateLoss(neuralnetwork_t* nn, float* desiredOutput) {
 
 void mnist_getDesiredOutput(uint8_t label, float* desiredOutput) {
 	for (uint8_t i = 0; i < 10; i++) {
-		desiredOutput[i] = label == i ? 1.0 : 0.0;
+		desiredOutput[i] = label == i ? 1.0f : 0.0f;
 	}
 
 	return;
@@ -366,26 +313,25 @@ int main() {
 #define NUMOFLAYERS 4
 #define NUMOFINPUTLAYERS	(28 * 28)
 
-	csvparser_t parser;
-	uint16_t done, err;
+	srand((uint16_t)time(NULL));
 
 	csvparser_init(&parser, filename_train);
 
-	char* header = fread_csv_line(parser.fp, 8192, &done, &err);
-	free(header);
+	char* header = NULL;
 
-	mnist_data_t mnist_out[10];
+	header = csvparser_readLine(&parser);
 
-	//parse_mnist_line(&parser, &mnist_out);
-	parse_mnist(&parser, &mnist_out, 10);
+	mnist_data_t* mnist_out = malloc(sizeof(mnist_data_t) * 4096);
+
+	mnist_parse(&parser, mnist_out, 4096);
 
 	fclose(parser.fp);
+
+	mnist_shuffle(mnist_out, 4096);
 
 	neuralnetwork_t serigala;
 	uint16_t numOfNeurons[NUMOFLAYERS] = { NUMOFINPUTLAYERS, 16, 16, 10};
 	void (*activations[NUMOFLAYERS - 1])(float, float*) = { activation_sigmoid, activation_sigmoid, activation_linear };
-
-	srand((uint16_t)time(NULL));
 
 	neuralnetwork_init(&serigala, NUMOFLAYERS, numOfNeurons, activations);
 

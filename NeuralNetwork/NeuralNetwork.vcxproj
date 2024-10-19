@@ -127,9 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\csv_parser\csv.c" />
-    <ClCompile Include="..\csv_parser\fread_csv_line.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="mnist_csv.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mnist_csv.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

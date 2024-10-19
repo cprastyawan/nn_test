@@ -57,7 +57,7 @@ static uint8_t csvparser_init(csvparser_t* parser, const char* filename) {
 }
 
 static uint8_t parse_mnist_line(csvparser_t* parser ,mnist_data_t* out) {
-	uint16_t done, err;
+	uint16_t done = 0, err = 0;
 
 	char* mnist_line = fread_csv_line(parser->fp, 16384, &done, &err);
 	mnist_data_t out_mnist;
@@ -77,6 +77,14 @@ static uint8_t parse_mnist_line(csvparser_t* parser ,mnist_data_t* out) {
 	free_csv_line(parsed);
 
 	return 1;
+}
+
+static void parse_mnist(csvparser_t* parser, mnist_data_t* out, uint16_t size) {
+	for (uint16_t i = 0; i < size; i++) {
+		parse_mnist_line(parser, &out[i]);
+	}
+
+	return;
 }
 
 static void activation_relu(float input, float* output) {
@@ -288,6 +296,14 @@ uint8_t neuralnetwork_execute(neuralnetwork_t* nn) {
 	return 1;
 }
 
+void neuralnetwork_calculateError(neuralnetwork_t* nn, float* desiredOutput, float* output) {
+	for (uint16_t i = 0; i < nn->outputLayer->neurons.numOfNeurons; i++) {
+		output[i] = nn->outputLayer->neurons.values[i] - desiredOutput[i];
+	}
+
+	return;
+}
+
 float neuralnetwork_calculateLoss(neuralnetwork_t* nn, float* desiredOutput) {
 	float loss = 0.0;
 
@@ -358,9 +374,10 @@ int main() {
 	char* header = fread_csv_line(parser.fp, 8192, &done, &err);
 	free(header);
 
-	mnist_data_t mnist_out;
+	mnist_data_t mnist_out[10];
 
-	parse_mnist_line(&parser, &mnist_out);
+	//parse_mnist_line(&parser, &mnist_out);
+	parse_mnist(&parser, &mnist_out, 10);
 
 	fclose(parser.fp);
 
@@ -375,6 +392,7 @@ int main() {
 	neuralnetwork_initRandomWeights(&serigala);
 	neuralnetwork_initZeroBias(&serigala);
 
+	/*
 	neuralnetwork_input(&serigala, mnist_out.data);
 	neuralnetwork_execute(&serigala);
 
@@ -385,6 +403,7 @@ int main() {
 	float loss = neuralnetwork_calculateLoss(&serigala, desiredOutput);
 
 	printf("Loss: %f\r\n", loss);
+	*/
 	
 	//neuralnetwork_print(&serigala);
 

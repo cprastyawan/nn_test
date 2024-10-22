@@ -21,6 +21,12 @@
     <ClCompile Include="mnist_csv.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="get_weight.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ns.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mnist_csv.h">

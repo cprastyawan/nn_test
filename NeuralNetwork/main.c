@@ -13,6 +13,7 @@ typedef struct _neuron {
 	float* tmpValues;
 	float* biases;
 	float** weights;
+	float* dZ;
 	uint16_t numOfNeurons;
 } neuron_t;
 
@@ -30,9 +31,39 @@ typedef struct {
 	layer_t layers;
 } neuralnetwork_t;
 
-static const char* filename_train = "dataset/mnist_train.csv";
+extern void init_weightsandbiases();
+extern float** get_weightspointer(uint16_t layer);
+extern float* get_biaspointer(uint16_t layer);
+
+extern uint64_t ns();
+
+static const char* filename_train = "dataset/mnist_test.csv";
+
+float* softmax_param_pTmpValues;
+uint16_t* softmax_param_num_neurons;
 
 csvparser_t parser;
+
+uint16_t macNumber = 0;
+
+static void activation_softmax(float input, float* output) {
+	float total = 0.0f;
+
+	for (uint16_t i = 0; i < *softmax_param_num_neurons; i++) {
+		total += expf(softmax_param_pTmpValues[i]);
+	}
+
+	*output = (expf(input) / total);
+
+	return;
+}
+
+static void softmax_init(neuralnetwork_t* nn) {
+	softmax_param_pTmpValues = nn->outputLayer->neurons.tmpValues;
+	softmax_param_num_neurons = &nn->outputLayer->neurons.numOfNeurons;
+
+	return;
+}
 
 static void activation_relu(float input, float* output) {
 	*output = input > 0.f ? input : 0.f;
@@ -58,12 +89,14 @@ static void _neuralnetwork_initLayer(layer_t* layer, uint16_t numOfNeurons,
 		layer->neurons.weights = NULL;
 		layer->neurons.biases = NULL;
 		layer->neurons.tmpValues = NULL;
+		layer->neurons.dZ = NULL;
 	} else {
 		prevLayer->next = layer;
 
 		layer->neurons.weights = malloc(sizeof(float*) * numOfNeurons);
 		layer->neurons.biases = malloc(sizeof(float) * numOfNeurons);
 		layer->neurons.tmpValues = malloc(sizeof(float) * numOfNeurons);
+		layer->neurons.dZ = malloc(sizeof(float) * numOfNeurons);
 
 		for (uint16_t i = 0; i < numOfNeurons; i++) {
 			layer->neurons.weights[i] = malloc(sizeof(float) * prevLayer->neurons.numOfNeurons);
@@ -198,6 +231,8 @@ uint8_t neuralnetwork_init(neuralnetwork_t* nn, uint16_t numOfLayers, uint16_t* 
 
 static void matvecmult(float** mat, float* vec, float* out, uint16_t rows, uint16_t columns) {
 	for (uint16_t i = 0; i < rows; i++) {
+		out[i] = 0.0f;
+
 		for (uint16_t j = 0; j < columns; j++) {
 			out[i] += (mat[i][j] * vec[j]);
 		}
@@ -207,8 +242,16 @@ static void matvecmult(float** mat, float* vec, float* out, uint16_t rows, uint1
 }
 
 static void vecsadd(float* vec1, float* vec2, float* out, uint16_t vecSize) {
-	for (uint16_t i = 0; i < vecSize; i++) {
-		out[i] = vec1[i] + vec2[i];
+	while (vecSize--) {
+		*(out++) = *(vec1++) + *(vec2)++;
+	}
+
+	return;
+}
+
+static void vecssub(float* vec1, float* vec2, float* out, uint16_t vecSize) {
+	while (vecSize--) {
+		*(out++) = *(vec1++) - *(vec2)++;
 	}
 
 	return;
@@ -222,7 +265,7 @@ uint8_t neuralnetwork_input(neuralnetwork_t* nn, float* input) {
 	return 1;
 }
 
-uint8_t neuralnetwork_execute(neuralnetwork_t* nn) {
+uint8_t neuralnetwork_feedforward(neuralnetwork_t* nn) {
 	layer_t* pLayer = nn->inputLayer;
 
 	while (pLayer->next != NULL) {
@@ -239,6 +282,62 @@ uint8_t neuralnetwork_execute(neuralnetwork_t* nn) {
 
 		pLayer = pLayer->next;
 	}
+
+	return 1;
+}
+
+float neuralnetwork_derivative(void (*f)(float, float*), float x) {
+	const float t = 1.0e-6;
+
+	float output;
+
+	float xA = x + t;
+	float xB = x - t;
+
+	float yA;
+	float yB;
+
+	f(xA, &yA);
+	f(xB, &yB);
+
+	output = (yA - yB) / (xA - xB);
+
+	return output;
+}
+
+uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, float *desiredValues) {
+	const float alpha = 0.01f;
+	float* errors = malloc(sizeof(float) * layer->neurons.numOfNeurons);
+
+	vecssub(layer->neurons.values, desiredValues, errors, layer->neurons.numOfNeurons);
+
+	if (layer->next == NULL) {
+		for (uint16_t i = 0; i < layer->neurons.numOfNeurons; i++) {
+			layer->neurons.dZ[i] = errors[i] * neuralnetwork_derivative(layer->activation, layer->neurons.tmpValues[i]);
+
+			for (uint16_t j = 0; j < layer->prev->neurons.numOfNeurons; j++) {
+				layer->neurons.weights[i][j] -= (alpha * (layer->neurons.dZ[i] * layer->prev->neurons.tmpValues[i]));
+			}
+
+			layer->neurons.biases[i] -= (alpha * layer->neurons.dZ[i]);
+		}
+	}
+	else {
+		for (uint16_t i = 0; i < layer->neurons.numOfNeurons; i++) {
+			float tmp = 0.0f;
+
+			for (uint16_t j = 0; j < layer->next->neurons.numOfNeurons; j++) {
+				tmp += layer->next->neurons.dZ[i] * layer->next->neurons.weights[j][i];
+			}
+		}
+	}
+
+
+	return 1;
+}
+
+uint8_t neuralnetwork_backpropagate(neuralnetwork_t* nn, float* desiredOutput) {
+	neuralnetwork_layerBackpropagate(nn->outputLayer, desiredOutput);
 
 	return 1;
 }
@@ -309,38 +408,92 @@ uint8_t neuralnetwork_print(neuralnetwork_t* nn) {
 	return 1;
 }
 
+uint8_t xor_dataset[] = { 0, 1, 0, 3, 2, 1, 3, 2, 2, 1, 0, 2, 1, 3 };
+
+void xor_desiredoutput(uint8_t input, float* output) {
+	switch (input) {
+	case 0:
+		*output = 0.0;
+		break;
+	case 1:
+		*output = 1.0;
+		break;
+	case 2:
+		*output = 1.0;
+		break;
+	case 3:
+		*output = 0.0;
+		break;
+	}
+
+	return;
+}
+
 int main() {
 #define NUMOFLAYERS 4
 #define NUMOFINPUTLAYERS	(28 * 28)
 
 	srand((uint16_t)time(NULL));
 
+	init_weightsandbiases();
+
+#define MNIST_TESTSIZE	512
+
 	csvparser_init(&parser, filename_train);
 
 	char* header = NULL;
 
 	header = csvparser_readLine(&parser);
-
-	mnist_data_t* mnist_out = malloc(sizeof(mnist_data_t) * 4096);
-
-	mnist_parse(&parser, mnist_out, 4096);
+	mnist_data_t* mnist_out = malloc(sizeof(mnist_data_t) * MNIST_TESTSIZE);
+	mnist_parse(&parser, mnist_out, MNIST_TESTSIZE);
 
 	fclose(parser.fp);
 
-	mnist_shuffle(mnist_out, 4096);
+	mnist_shuffle(mnist_out, MNIST_TESTSIZE);
 
 	neuralnetwork_t serigala;
-	uint16_t numOfNeurons[NUMOFLAYERS] = { NUMOFINPUTLAYERS, 16, 16, 10};
-	void (*activations[NUMOFLAYERS - 1])(float, float*) = { activation_sigmoid, activation_sigmoid, activation_linear };
+	uint16_t numOfNeurons[NUMOFLAYERS] = { NUMOFINPUTLAYERS, 256, 256, 10};
+	void (*activations[NUMOFLAYERS - 1])(float, float*) = { activation_relu, activation_relu, activation_softmax };
 
 	neuralnetwork_init(&serigala, NUMOFLAYERS, numOfNeurons, activations);
 
-	neuralnetwork_initRandomWeights(&serigala);
-	neuralnetwork_initZeroBias(&serigala);
+	softmax_init(&serigala);
+
+	neuralnetwork_initLayerNeuronsWeight(serigala.inputLayer->next, get_weightspointer(0));
+	neuralnetwork_initLayerNeuronsWeight(serigala.inputLayer->next->next, get_weightspointer(1));
+	neuralnetwork_initLayerNeuronsWeight(serigala.outputLayer, get_weightspointer(2));
+
+	neuralnetwork_initLayerBias(serigala.inputLayer->next, get_biaspointer(0));
+	neuralnetwork_initLayerBias(serigala.inputLayer->next->next, get_biaspointer(1));
+	neuralnetwork_initLayerBias(serigala.outputLayer, get_biaspointer(2));
+	//neuralnetwork_initRandomWeights(&serigala);
+	//neuralnetwork_initZeroBias(&serigala);
+
+	float totalLosses = 0.0f;
+
+	for (uint16_t i = 0; i < MNIST_TESTSIZE; i++) {
+		float desiredOutput[MNIST_TESTSIZE];
+
+		neuralnetwork_input(&serigala, mnist_out[i].data);
+		
+		uint64_t t = ns();
+
+		neuralnetwork_feedforward(&serigala);
+
+		t = ns() - t;
+		mnist_getDesiredOutput(mnist_out[i].label, desiredOutput);
+
+		float loss = neuralnetwork_calculateLoss(&serigala, desiredOutput);
+		printf("I-%d\tlabel: %d\tLoss: %f\tTime: %llu\r\n", i, mnist_out[i].label, loss, t);
+
+		totalLosses += loss;
+	}
+
+	printf("Total Loss: %f, Accuracy: %f\r\n", totalLosses / MNIST_TESTSIZE, (1 - totalLosses / MNIST_TESTSIZE));
 
 	/*
 	neuralnetwork_input(&serigala, mnist_out.data);
-	neuralnetwork_execute(&serigala);
+	neuralnetwork_feedforward(&serigala);
 
 	float desiredOutput[10];
 

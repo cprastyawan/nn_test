@@ -127,13 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="activation_function.c" />
     <ClCompile Include="get_weight.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mnist_csv.c" />
+    <ClCompile Include="neuralnetwork.c" />
     <ClCompile Include="ns.c" />
+    <ClCompile Include="rambutan.c" />
+    <ClCompile Include="serigala.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="activation_function.h" />
     <ClInclude Include="mnist_csv.h" />
+    <ClInclude Include="neuralnetwork.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

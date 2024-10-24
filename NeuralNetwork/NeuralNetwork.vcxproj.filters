@@ -27,10 +27,28 @@
     <ClCompile Include="ns.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rambutan.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="neuralnetwork.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="activation_function.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serigala.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mnist_csv.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="neuralnetwork.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="activation_function.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

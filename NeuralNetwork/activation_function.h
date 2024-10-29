@@ -1,9 +1,10 @@
 #pragma once
 #include <stdint.h>
+#include "floating_point.h"
 
 typedef struct {
-	void (*function)(float*, float*, uint16_t);
-	void (*derivative)(float*, float*, uint16_t);
+	void (*function)(floating_point*, floating_point*, uint16_t);
+	void (*derivative)(floating_point*, floating_point*, uint16_t);
 } activation_t;
 
 extern activation_t relu;

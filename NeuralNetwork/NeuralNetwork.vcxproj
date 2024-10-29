@@ -138,6 +138,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="activation_function.h" />
+    <ClInclude Include="floating_point.h" />
     <ClInclude Include="mnist_csv.h" />
     <ClInclude Include="neuralnetwork.h" />
   </ItemGroup>

@@ -2,37 +2,59 @@
 
 #include <math.h>
 
-static void f_relu(float* input, float* output, uint16_t size) {
+static void f_relu(floating_point* input, floating_point* output, uint16_t size) {
 	while (size--) {
-		float vInput = *(input++);
+		floating_point vInput = *(input++);
 
-		*(output++) = (vInput) > 0.f ? (vInput) : 0.f;
+		*(output++) = (vInput) > 0.0 ? (vInput) : 0.0;
 	}
 	
 	return;
 }
 
-static void d_relu(float* input, float* output, uint16_t size) {
+static floating_point _expo(floating_point input) {
+	floating_point result;
+
+#if FLOATING_POINT==FLOAT
+	result = expf(input);
+
+	if (isnan(result)) {
+		result = 0.001f;
+	}
+
+	return result;
+#else
+	floating_point result = exp(input);
+
+	if (isnan(result)) {
+		result = 1e-6;
+	}
+#endif
+
+	return result;
+}
+
+static void d_relu(floating_point* input, floating_point* output, uint16_t size) {
 	while (size--) {
-		*(output++) = *(input++) > 0.f ? 1 : 0.f;
+		*(output++) = *(input++) > 0.0 ? 1 : 0.0;
 	}
 
 	return;
 }
 
-static void f_sigmoid(float* input, float* output, uint16_t size) {
+static void f_sigmoid(floating_point* input, floating_point* output, uint16_t size) {
 	while (size--) {
-		*(output++) = (1.0f / (1.0f + expf(-(*(input++)))));
+		*(output++) = (1.0 / (1.0 + _expo(-(*(input++)))));
 	}
 	
 	return;
 }
 
-static void d_sigmoid(float* input, float* output, uint16_t size) {
+static void d_sigmoid(floating_point* input, floating_point* output, uint16_t size) {
 	f_sigmoid(input, output, size);
 
 	while (size--) {
-		float vInput = *(output);
+		floating_point vInput = *(output);
 
 		*(output++) = vInput / (1 - vInput);
 	}
@@ -40,30 +62,30 @@ static void d_sigmoid(float* input, float* output, uint16_t size) {
 	return;
 }
 
-static void f_softmax(float* input, float* output, uint16_t size) {
-	float maxVal = *input;
-	float total = 0.0f;
+static void f_softmax(floating_point* input, floating_point* output, uint16_t size) {
+	floating_point maxVal = *input;
+	floating_point total = 0.0;
 
 	for (uint16_t i = 1; i < size; i++) {
 		maxVal = input[i] > maxVal ? input[i] : maxVal;
 	}
 
 	for (uint16_t i = 0; i < size; i++) {
-		total += expf(input[i] - maxVal);
+		total += _expo(input[i] - maxVal);
 	}
 
 	while (size--) {
-		*(output++) = expf(*(input++) - maxVal) / total;
+		*(output++) = _expo(*(input++) - maxVal) / total;
 	}
 
 	return;
 }
 
-static void d_softmax(float* input, float* output, uint16_t size) {
+static void d_softmax(floating_point* input, floating_point* output, uint16_t size) {
 	return;
 }
 
-static void f_linear(float* input, float* output, uint16_t size) {
+static void f_linear(floating_point* input, floating_point* output, uint16_t size) {
 	while (size--) {
 		*(output++) = *(input++);
 	}
@@ -71,7 +93,7 @@ static void f_linear(float* input, float* output, uint16_t size) {
 	return;
 }
 
-static void d_linear(float* input, float* output, uint16_t size) {
+static void d_linear(floating_point* input, floating_point* output, uint16_t size) {
 	while (size--) {
 		*(output++) = 1;
 	}

@@ -10,7 +10,7 @@
 
 uint16_t macNumber = 0;
 
-static void matvecmult(float** mat, float* vec, float* out, uint16_t rows, uint16_t columns) {
+static void matvecmult(floating_point** mat, floating_point* vec, floating_point* out, uint16_t rows, uint16_t columns) {
 	for (uint16_t i = 0; i < rows; i++) {
 		out[i] = 0.0f;
 
@@ -22,7 +22,7 @@ static void matvecmult(float** mat, float* vec, float* out, uint16_t rows, uint1
 	return;
 }
 
-static void vecsadd(float* vec1, float* vec2, float* out, uint16_t vecSize) {
+static void vecsadd(floating_point* vec1, floating_point* vec2, floating_point* out, uint16_t vecSize) {
 	while (vecSize--) {
 		*(out++) = *(vec1++) + *(vec2)++;
 	}
@@ -30,7 +30,7 @@ static void vecsadd(float* vec1, float* vec2, float* out, uint16_t vecSize) {
 	return;
 }
 
-static void vecssub(float* vec1, float* vec2, float* out, uint16_t vecSize) {
+static void vecssub(floating_point* vec1, floating_point* vec2, floating_point* out, uint16_t vecSize) {
 	while (vecSize--) {
 		*(out++) = *(vec1++) - *(vec2)++;
 	}
@@ -38,17 +38,17 @@ static void vecssub(float* vec1, float* vec2, float* out, uint16_t vecSize) {
 	return;
 }
 
-static float _derivative(void (*f)(float, float*), float x) {
-	const float t = 1.0e-6;
-	//const float t = 1.0f;
+static floating_point _derivative(void (*f)(floating_point, floating_point*), floating_point x) {
+	const floating_point t = 1.0e-6;
+	//const floating_point t = 1.0f;
 
-	float output;
+	floating_point output;
 
-	float xA = x + t;
-	float xB = x - t;
+	floating_point xA = x + t;
+	floating_point xB = x - t;
 
-	float yA;
-	float yB;
+	floating_point yA;
+	floating_point yB;
 
 	f(xA, &yA);
 	f(xB, &yB);
@@ -69,26 +69,26 @@ static void _neuralnetwork_initLayer(layer_t* layer, uint16_t numOfNeurons,
 	else {
 		prevLayer->next = layer;
 
-		layer->neurons.weights = malloc(sizeof(float*) * numOfNeurons);
-		layer->neurons.dweights = malloc(sizeof(float*) * numOfNeurons);
+		layer->neurons.weights = malloc(sizeof(floating_point*) * numOfNeurons);
+		layer->neurons.dweights = malloc(sizeof(floating_point*) * numOfNeurons);
 
-		layer->neurons.bias = malloc(sizeof(float) * numOfNeurons);
-		layer->neurons.dbias = malloc(sizeof(float) * numOfNeurons);
+		layer->neurons.bias = malloc(sizeof(floating_point) * numOfNeurons);
+		layer->neurons.dbias = malloc(sizeof(floating_point) * numOfNeurons);
 
 		for (uint16_t i = 0; i < numOfNeurons; i++) {
-			layer->neurons.weights[i] = malloc(sizeof(float) * prevLayer->neurons.numOfNeurons);
-			layer->neurons.dweights[i] = malloc(sizeof(float) * prevLayer->neurons.numOfNeurons);
+			layer->neurons.weights[i] = malloc(sizeof(floating_point) * prevLayer->neurons.numOfNeurons);
+			layer->neurons.dweights[i] = malloc(sizeof(floating_point) * prevLayer->neurons.numOfNeurons);
 			//layer->neurons.z[i] = 0.f;
 			//layer->neurons.dz[i] = 0.f;
 		}
 	}
 
 	layer->neurons.numOfNeurons = numOfNeurons;
-	layer->neurons.actv = malloc(sizeof(float) * numOfNeurons);
-	layer->neurons.dactv = malloc(sizeof(float) * numOfNeurons);
+	layer->neurons.actv = malloc(sizeof(floating_point) * numOfNeurons);
+	layer->neurons.dactv = malloc(sizeof(floating_point) * numOfNeurons);
 
-	layer->neurons.z = malloc(sizeof(float) * numOfNeurons);
-	layer->neurons.dz = malloc(sizeof(float) * numOfNeurons);
+	layer->neurons.z = malloc(sizeof(floating_point) * numOfNeurons);
+	layer->neurons.dz = malloc(sizeof(floating_point) * numOfNeurons);
 
 	layer->activation = activation;
 	layer->prev = prevLayer;
@@ -97,7 +97,7 @@ static void _neuralnetwork_initLayer(layer_t* layer, uint16_t numOfNeurons,
 	return;
 }
 
-static uint8_t neuralnetwork_initNeuronWeights(float* weightDst, uint16_t numOfPrevlayerNeurons, float* weightSrc) {
+static uint8_t neuralnetwork_initNeuronWeights(floating_point* weightDst, uint16_t numOfPrevlayerNeurons, floating_point* weightSrc) {
 	while (numOfPrevlayerNeurons--) {
 		*(weightDst++) = *(weightSrc++);
 	}
@@ -106,15 +106,15 @@ static uint8_t neuralnetwork_initNeuronWeights(float* weightDst, uint16_t numOfP
 }
 
 static uint8_t neuralnetwork_initLayerRandomWeights(layer_t* layer) {
-	const float Max = 1.f;
-	const float Min = -1.f;
-	float** weights = malloc(sizeof(float*) * layer->neurons.numOfNeurons);
+	const floating_point Max = 1.0;
+	const floating_point Min = -1.0;
+	floating_point** weights = malloc(sizeof(floating_point*) * layer->neurons.numOfNeurons);
 
 	for (uint16_t i = 0; i < layer->neurons.numOfNeurons; i++) {
-		*(weights + i) = malloc(sizeof(float) * layer->prev->neurons.numOfNeurons);
+		*(weights + i) = malloc(sizeof(floating_point) * layer->prev->neurons.numOfNeurons);
 
 		for (uint16_t j = 0; j < layer->prev->neurons.numOfNeurons; j++) {
-			(*(weights + i))[j] = (((float)rand() / (float)RAND_MAX) * (Max - Min)) + Min;
+			(*(weights + i))[j] = (((floating_point)rand() / (floating_point)RAND_MAX) * (Max - Min)) + Min;
 		}
 	}
 
@@ -129,10 +129,10 @@ static uint8_t neuralnetwork_initLayerRandomWeights(layer_t* layer) {
 	return 1;
 }
 
-uint8_t neuralnetwork_initLayerNeuronsWeight(layer_t* layer, float** weightSrc) {
+uint8_t neuralnetwork_initLayerNeuronsWeight(layer_t* layer, floating_point** weightSrc) {
 	if (layer->prev == NULL || layer->neurons.weights == NULL) return -1;
 
-	float** weightDst = layer->neurons.weights;
+	floating_point** weightDst = layer->neurons.weights;
 
 	for (uint16_t i = 0; i < layer->neurons.numOfNeurons; i++) {
 		neuralnetwork_initNeuronWeights(weightDst[i], layer->prev->neurons.numOfNeurons, weightSrc[i]);
@@ -141,7 +141,7 @@ uint8_t neuralnetwork_initLayerNeuronsWeight(layer_t* layer, float** weightSrc) 
 	return 1;
 }
 
-void neuralnetwork_initLayerBias(layer_t* layer, float* bias) {
+void neuralnetwork_initLayerBias(layer_t* layer, floating_point* bias) {
 	for (uint16_t i = 0; i < layer->neurons.numOfNeurons; i++) {
 		layer->neurons.bias[i] = bias[i];
 	}
@@ -168,7 +168,7 @@ void neuralnetwork_initZeroBias(neuralnetwork_t* nn) {
 	uint16_t i = 0;
 
 	while (pLayer != NULL) {
-		float* bias = malloc(pLayer->neurons.numOfNeurons * sizeof(float));
+		floating_point* bias = malloc(pLayer->neurons.numOfNeurons * sizeof(floating_point));
 
 		for (uint16_t i = 0; i < pLayer->neurons.numOfNeurons; i++) {
 			bias[i] = 0.0f;
@@ -214,7 +214,7 @@ uint8_t neuralnetwork_init(neuralnetwork_t* nn, uint16_t numOfLayers, uint16_t* 
 	return 1;
 }
 
-uint8_t neuralnetwork_input(neuralnetwork_t* nn, float* input) {
+uint8_t neuralnetwork_input(neuralnetwork_t* nn, floating_point* input) {
 	for (uint16_t i = 0; i < nn->inputLayer->neurons.numOfNeurons; i++) {
 		nn->inputLayer->neurons.actv[i] = input[i];
 	}
@@ -241,9 +241,9 @@ uint8_t neuralnetwork_feedforward(neuralnetwork_t* nn) {
 	return 1;
 }
 
-uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, float* desiredActv) {
+uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, floating_point* desiredActv) {
 	if (layer->next == NULL) {
-		float* errors = malloc(sizeof(float) * layer->neurons.numOfNeurons);
+		floating_point* errors = malloc(sizeof(floating_point) * layer->neurons.numOfNeurons);
 
 		vecssub(layer->neurons.actv, desiredActv, errors, layer->neurons.numOfNeurons);
 
@@ -253,7 +253,7 @@ uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, float* desiredActv) {
 			layer->neurons.dactv[i] = errors[i];
 			//layer->neurons.dz[i] = _derivative(layer->activation, layer->neurons.actv[i]);
 
-			float tmp = layer->neurons.dz[i] * layer->neurons.dactv[i];
+			floating_point tmp = layer->neurons.dz[i] * layer->neurons.dactv[i];
 
 			for (uint16_t j = 0; j < layer->prev->neurons.numOfNeurons; j++) {
 				layer->neurons.dweights[i][j] = tmp * layer->prev->neurons.actv[j];
@@ -274,7 +274,7 @@ uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, float* desiredActv) {
 					* layer->next->neurons.weights[j][i]);
 			}
 
-			float tmp = layer->neurons.dactv[i] * layer->neurons.dz[i];
+			floating_point tmp = layer->neurons.dactv[i] * layer->neurons.dz[i];
 
 			for (uint16_t j = 0; j < layer->prev->neurons.numOfNeurons; j++) {
 				layer->neurons.dweights[i][j] = tmp * layer->prev->neurons.z[j];
@@ -287,7 +287,7 @@ uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, float* desiredActv) {
 	return 1;
 }
 
-uint8_t neuralnetwork_backpropagate(neuralnetwork_t* nn, float* desiredOutput, float alpha) {
+uint8_t neuralnetwork_backpropagate(neuralnetwork_t* nn, floating_point* desiredOutput, floating_point alpha) {
 	for (uint16_t i = 0; i < nn->inputLayer->neurons.numOfNeurons; i++) {
 		nn->inputLayer->neurons.z[i] = nn->inputLayer->neurons.actv[i];
 	}
@@ -319,7 +319,7 @@ uint8_t neuralnetwork_backpropagate(neuralnetwork_t* nn, float* desiredOutput, f
 	return 1;
 }
 
-void neuralnetwork_calculateError(neuralnetwork_t* nn, float* desiredOutput, float* output) {
+void neuralnetwork_calculateError(neuralnetwork_t* nn, floating_point* desiredOutput, floating_point* output) {
 	for (uint16_t i = 0; i < nn->outputLayer->neurons.numOfNeurons; i++) {
 		output[i] = nn->outputLayer->neurons.actv[i] - desiredOutput[i];
 	}
@@ -327,8 +327,8 @@ void neuralnetwork_calculateError(neuralnetwork_t* nn, float* desiredOutput, flo
 	return;
 }
 
-float neuralnetwork_calculateLoss(neuralnetwork_t* nn, float* desiredOutput) {
-	float loss = 0.0;
+floating_point neuralnetwork_calculateLoss(neuralnetwork_t* nn, floating_point* desiredOutput) {
+	floating_point loss = 0.0;
 
 	for (uint16_t i = 0; i < nn->outputLayer->neurons.numOfNeurons; i++) {
 		//loss += powf(nn->outputLayer->neurons.actv[i] - desiredOutput[i], 2

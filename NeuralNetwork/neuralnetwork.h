@@ -2,20 +2,21 @@
 
 #include <stdint.h>
 #include "activation_function.h"
+#include "floating_point.h"
 
 typedef struct _neuron {
-	float* actv;
-	float* dactv;
+	floating_point* actv;
+	floating_point* dactv;
 
-	float* z;
-	float* dz;
+	floating_point* z;
+	floating_point* dz;
 
-	float* bias;
-	float** weights;
+	floating_point* bias;
+	floating_point** weights;
 
-	float* dbias;
+	floating_point* dbias;
 
-	float** dweights;
+	floating_point** dweights;
 	uint16_t numOfNeurons;
 } neuron_t;
 
@@ -33,16 +34,16 @@ typedef struct {
 	layer_t layers;
 } neuralnetwork_t;
 
-uint8_t neuralnetwork_initLayerNeuronsWeight(layer_t* layer, float** weightSrc);
-void neuralnetwork_initLayerBias(layer_t* layer, float* bias);
+uint8_t neuralnetwork_initLayerNeuronsWeight(layer_t* layer, floating_point** weightSrc);
+void neuralnetwork_initLayerBias(layer_t* layer, floating_point* bias);
 void neuralnetwork_initRandomWeights(neuralnetwork_t* nn);
 void neuralnetwork_initZeroBias(neuralnetwork_t* nn);
-uint8_t neuralnetwork_input(neuralnetwork_t* nn, float* input);
+uint8_t neuralnetwork_input(neuralnetwork_t* nn, floating_point* input);
 uint8_t neuralnetwork_feedforward(neuralnetwork_t* nn);
-uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, float* desiredActv);
-uint8_t neuralnetwork_backpropagate(neuralnetwork_t* nn, float* desiredOutput, float alpha);
-void neuralnetwork_calculateError(neuralnetwork_t* nn, float* desiredOutput, float* output);
-float neuralnetwork_calculateLoss(neuralnetwork_t* nn, float* desiredOutput);
+uint8_t neuralnetwork_layerBackpropagate(layer_t* layer, floating_point* desiredActv);
+uint8_t neuralnetwork_backpropagate(neuralnetwork_t* nn, floating_point* desiredOutput, floating_point alpha);
+void neuralnetwork_calculateError(neuralnetwork_t* nn, floating_point* desiredOutput, floating_point* output);
+floating_point neuralnetwork_calculateLoss(neuralnetwork_t* nn, floating_point* desiredOutput);
 uint8_t neuralnetwork_print(neuralnetwork_t* nn);
 uint8_t neuralnetwork_init(neuralnetwork_t* nn, uint16_t numOfLayers, uint16_t* numOfNeurons,
 	activation_t* activations);

@@ -50,5 +50,8 @@
     <ClInclude Include="activation_function.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="floating_point.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

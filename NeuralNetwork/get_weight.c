@@ -1,25 +1,26 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "floating_point.h"
 
-static float** weights_inputlayer_to_hiddenlayer1;
-static float* bias_inputlayer_to_hiddenlayer1;
+static floating_point** weights_inputlayer_to_hiddenlayer1;
+static floating_point* bias_inputlayer_to_hiddenlayer1;
 
-static float** weights_hiddenlayer1_to_hiddenlayer2;
-static float* bias_hiddenlayer1_to_hiddenlayer2;
+static floating_point** weights_hiddenlayer1_to_hiddenlayer2;
+static floating_point* bias_hiddenlayer1_to_hiddenlayer2;
 
-static float** weights_hiddenlayer2_to_outputlayer;
-static float* bias_hiddenlayer2_to_outputlayer;
+static floating_point** weights_hiddenlayer2_to_outputlayer;
+static floating_point* bias_hiddenlayer2_to_outputlayer;
 
-static void get_weights(const char* filename, float*** p, uint16_t numOfNeurons, uint16_t numOfPrevLayerNeurons) {
+static void get_weights(const char* filename, floating_point*** p, uint16_t numOfNeurons, uint16_t numOfPrevLayerNeurons) {
 	FILE* fp = fopen(filename, "rb");
 
-	*p = malloc(sizeof(float*) * numOfNeurons);
+	*p = malloc(sizeof(floating_point*) * numOfNeurons);
 
 	for (uint16_t i = 0; i < numOfNeurons; i++) {
-		(*p)[i] = malloc(sizeof(float) * numOfPrevLayerNeurons);
+		(*p)[i] = malloc(sizeof(floating_point) * numOfPrevLayerNeurons);
 
-		fread((*p)[i], sizeof(float), numOfPrevLayerNeurons, fp);
+		fread((*p)[i], sizeof(floating_point), numOfPrevLayerNeurons, fp);
 	}
 
 	fclose(fp);
@@ -27,12 +28,12 @@ static void get_weights(const char* filename, float*** p, uint16_t numOfNeurons,
 	return;
 }
 
-static void get_biases(const char* filename, float** p, uint16_t numOfNeurons) {
+static void get_biases(const char* filename, floating_point** p, uint16_t numOfNeurons) {
 	FILE* fp = fopen(filename, "rb");
 
-	*p = malloc(sizeof(float) * numOfNeurons);
+	*p = malloc(sizeof(floating_point) * numOfNeurons);
 
-	fread(*p, sizeof(float), numOfNeurons, fp);
+	fread(*p, sizeof(floating_point), numOfNeurons, fp);
 
 	fclose(fp);
 
@@ -51,7 +52,7 @@ void init_weightsandbiases() {
 	return;
 }
 
-float** get_weightspointer(uint16_t layer) {
+floating_point** get_weightspointer(uint16_t layer) {
 	if (layer == 0) {
 		return weights_inputlayer_to_hiddenlayer1;
 	}
@@ -65,7 +66,7 @@ float** get_weightspointer(uint16_t layer) {
 	return NULL;
 }
 
-float* get_biaspointer(uint16_t layer) {
+floating_point* get_biaspointer(uint16_t layer) {
 	if (layer == 0) {
 		return bias_inputlayer_to_hiddenlayer1;
 	}

@@ -8,7 +8,7 @@
 
 typedef struct {
 	uint8_t label;
-	float input[2];
+	floating_point input[2];
 } xor_data_t;
 
 static uint8_t xor_datainit[] = {0, 1, 2, 3};
@@ -16,7 +16,7 @@ static xor_data_t xor_dataset[sizeof(xor_datainit)];
 
 static neuralnetwork_t rambutan;
 
-void xor_desiredoutput(uint8_t input, float* output) {
+void xor_desiredoutput(uint8_t input, floating_point* output) {
 	switch (input) {
 	case 0:
 		*output = 0.0;
@@ -75,7 +75,7 @@ void xor_shuffle() {
 }
 
 void rambutan_run() {
-	uint16_t numOfNeurons[] = { 2, 8, 8, 1 };
+	uint16_t numOfNeurons[] = { 2, 32, 32, 1 };
 
 	activation_t activations[3] = { relu, relu, linear};
 
@@ -92,7 +92,7 @@ void rambutan_run() {
 	for (uint32_t i = 0; i < 100000; i++) {
 		printf("iteration-%d\t", i);
 
-		float loss = 0.f;
+		floating_point loss = 0.f;
 
 		for (uint16_t j = 0; j < sizeof(xor_datainit); j++) {
 			neuralnetwork_input(&rambutan, xor_dataset[j].input);
@@ -100,10 +100,10 @@ void rambutan_run() {
 
 			//neuralnetwork_print(&rambutan);
 
-			float desiredOutput = (float)xor_dataset[j].label;
+			floating_point desiredOutput = (floating_point)xor_dataset[j].label;
 			loss += fabsf(desiredOutput - *rambutan.outputLayer->neurons.actv);
 
-			neuralnetwork_backpropagate(&rambutan, &desiredOutput, 0.1f);
+			neuralnetwork_backpropagate(&rambutan, &desiredOutput, 0.01f);
 			//printf("Input: %.1f ^ %.1f\tOutput:%f\r\n", xor_dataset[j].input[0], xor_dataset[j].input[1], 
 			//	*rambutan.outputLayer->neurons.actv);
 			//printf("\r\n\r\n");

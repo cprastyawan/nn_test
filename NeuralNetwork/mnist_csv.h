@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "floating_point.h"
 
 #define MAX_LINE_LENGTH 8192
 #define MAX_ROW_SIZE 1024
@@ -17,7 +18,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t label;
-	float data[28 * 28];
+	floating_point data[28 * 28];
 } mnist_data_t;
 
 uint8_t csvparser_init(csvparser_t* parser, const char* filename);

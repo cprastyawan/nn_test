@@ -10,8 +10,8 @@
 #include "neuralnetwork.h"
 
 extern void init_weightsandbiases();
-extern float** get_weightspointer(uint16_t layer);
-extern float* get_biaspointer(uint16_t layer);
+extern floating_point** get_weightspointer(uint16_t layer);
+extern floating_point* get_biaspointer(uint16_t layer);
 
 extern uint64_t ns();
 
@@ -21,10 +21,10 @@ csvparser_t parser;
 
 static const char* filename_train = "dataset/mnist_train.csv";
 
-//float* softmax_param_pz;
+//floating_point* softmax_param_pz;
 //uint16_t* softmax_param_num_neurons;
 
-void mnist_getDesiredOutput(uint8_t label, float* desiredOutput) {
+void mnist_getDesiredOutput(uint8_t label, floating_point* desiredOutput) {
 	for (uint8_t i = 0; i < 10; i++) {
 		desiredOutput[i] = label == i ? 1.0f : 0.0f;
 	}
@@ -32,23 +32,23 @@ void mnist_getDesiredOutput(uint8_t label, float* desiredOutput) {
 	return;
 }
 /*
-static void activation_softmax(float input, float* output) {
+static void activation_softmax(floating_point input, floating_point* output) {
 	double total = 0.0;
-	float maxVal = *softmax_param_pz;
+	floating_point maxVal = *softmax_param_pz;
 
 	for (uint16_t i = 1; i < *softmax_param_num_neurons; i++) {
 		maxVal = maxVal < softmax_param_pz[i] ? softmax_param_pz[i] : maxVal;
 	}
 
 	for (uint16_t i = 0; i < *softmax_param_num_neurons; i++) {
-		//float tmp = softmax_param_pz[i] > 80 ? 80 : softmax_param_pz[i];
+		//floating_point tmp = softmax_param_pz[i] > 80 ? 80 : softmax_param_pz[i];
 
 		total += exp(softmax_param_pz[i] - maxVal);
 	}
 
 	if (total == 0.0) total = 1.0e-3f;
 
-	*output = (float)((exp(input - maxVal) / (float)total));
+	*output = (floating_point)((exp(input - maxVal) / (floating_point)total));
 
 	return;
 }
@@ -60,27 +60,27 @@ static void softmax_init(neuralnetwork_t* nn) {
 	return;
 }
 
-static void activation_relu(float input, float* output) {
+static void activation_relu(floating_point input, floating_point* output) {
 	*output = input > 0.f ? input : 0.f;
 
 	return;
 }
 
-static void activation_sigmoid(float input, float* output) {
+static void activation_sigmoid(floating_point input, floating_point* output) {
 	*output = (1.0f / (1.0f + expf(input)));
 
 	return;
 }
 
-static void activation_linear(float input, float* output) {
+static void activation_linear(floating_point input, floating_point* output) {
 	*output = input;
 
 	return;
 }
 */
 
-static uint8_t mnist_correct(uint8_t label, float* actv) {
-	float maxActv = *actv;
+static uint8_t mnist_correct(uint8_t label, floating_point* actv) {
+	floating_point maxActv = *actv;
 	uint8_t maxIdx = 0;
 
 	for (uint8_t i = 1; i < 10; i++) {
@@ -129,7 +129,7 @@ void ready_run() {
 	uint16_t numCorrect = 0;
 
 	for (uint16_t i = 0; i < MNIST_TESTSIZE; i++) {
-		float desiredOutput[10];
+		floating_point desiredOutput[10];
 
 		neuralnetwork_input(&serigala, mnist_out[i].data);
 
@@ -143,7 +143,7 @@ void ready_run() {
 
 		uint8_t isCorrect = mnist_correct(mnist_out[i].label, serigala.outputLayer->neurons.actv);
 
-		float loss = neuralnetwork_calculateLoss(&serigala, desiredOutput);
+		floating_point loss = neuralnetwork_calculateLoss(&serigala, desiredOutput);
 
 		printf("I-%d\tlabel: %d\tLoss: %f\tCorrect: %s\tTime: %llu\r\n", i, mnist_out[i].label, loss,
 			isCorrect == 1 ? "Yes" : "No", t);
@@ -151,7 +151,7 @@ void ready_run() {
 		numCorrect += isCorrect;
 	}
 
-	float accuracy = (float)numCorrect / (float)MNIST_TESTSIZE;
+	floating_point accuracy = (floating_point)numCorrect / (floating_point)MNIST_TESTSIZE;
 
 	printf("Total Correct : %d, Accuracy: %f\r\n", numCorrect, accuracy);
 
@@ -160,8 +160,8 @@ void ready_run() {
 
 int main() {
 	//ready_run();
-	rambutan_run();
-	//serigala_run();
+	//rambutan_run();
+	serigala_run();
 
 	return 0;
 }

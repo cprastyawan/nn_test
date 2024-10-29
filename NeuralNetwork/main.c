@@ -159,9 +159,9 @@ void ready_run() {
 }
 
 int main() {
-	//ready_run();
+	ready_run();
 	//rambutan_run();
-	serigala_run();
+	//serigala_run();
 
 	return 0;
 }

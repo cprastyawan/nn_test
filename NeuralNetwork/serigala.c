@@ -42,7 +42,7 @@ int serigala_run() {
 #define NUMOFLAYERS 4
 #define NUMOFINPUTLAYERS	(28 * 28)
 
-#define MNIST_TESTSIZE	128
+#define MNIST_TESTSIZE	1024
 
 	csvparser_init(&parser, filename_train);
 
@@ -56,7 +56,7 @@ int serigala_run() {
 
 	neuralnetwork_t serigala;
 	uint16_t numOfNeurons[NUMOFLAYERS] = { NUMOFINPUTLAYERS, 64, 64, 10 };
-	activation_t activations[NUMOFLAYERS - 1] = { relu, relu, sigmoid };
+	activation_t activations[NUMOFLAYERS - 1] = { relu, relu, softmax };
 
 	neuralnetwork_init(&serigala, NUMOFLAYERS, numOfNeurons, activations);
 
@@ -81,7 +81,7 @@ int serigala_run() {
 
 			loss += neuralnetwork_calculateLoss(&serigala, desiredOutput);
 
-			neuralnetwork_backpropagate(&serigala, desiredOutput, 0.001);
+			neuralnetwork_backpropagate(&serigala, desiredOutput, 0.01);
 
 			lastMnistOut = mnist_out[j];
 		}

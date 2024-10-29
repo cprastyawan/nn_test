@@ -11,3 +11,4 @@ extern activation_t relu;
 extern activation_t sigmoid;
 extern activation_t softmax;
 extern activation_t linear;
+extern activation_t act_tanh;

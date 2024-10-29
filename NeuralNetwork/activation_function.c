@@ -82,6 +82,12 @@ static void f_softmax(floating_point* input, floating_point* output, uint16_t si
 }
 
 static void d_softmax(floating_point* input, floating_point* output, uint16_t size) {
+	f_softmax(input, output, size);
+
+	while (size--) {
+		floating_point vInput = *output;
+		*(output++) = vInput * (1 - vInput);
+	}
 	return;
 }
 
@@ -101,7 +107,36 @@ static void d_linear(floating_point* input, floating_point* output, uint16_t siz
 	return;
 }
 
+static floating_point func_tanh(floating_point input) {
+#if FLOATING_POINT==FLOAT
+	return tanhf(input);
+#else FLOATING_POINT==DOUBLE
+	return tanh(input);
+#endif
+}
+
+static void f_tanh(floating_point* input, floating_point* output, uint16_t size) {
+	while (size--) {
+		*(output++) = func_tanh(*input++);
+	}
+
+	return;
+}
+
+static void d_tanh(floating_point* input, floating_point* output, uint16_t size) {
+	f_tanh(input, output, size);
+
+	while (size--) {
+		floating_point vInput = *output;
+
+		*(output++) = 1 - pow(vInput, 2);
+	}
+
+	return;
+}
+
 activation_t relu = { .function = f_relu, .derivative = d_relu };
 activation_t sigmoid = { .function = f_sigmoid, .derivative = d_sigmoid };
 activation_t softmax = { .function = f_softmax, .derivative = d_softmax };
 activation_t linear = { .function = f_linear, .derivative = d_linear };
+activation_t act_tanh = { .function = f_tanh, .derivative = d_tanh };

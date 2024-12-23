@@ -21,22 +21,13 @@
     <ClCompile Include="mnist_csv.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="get_weight.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ns.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="rambutan.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="neuralnetwork.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="activation_function.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="serigala.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -52,6 +43,24 @@
     </ClInclude>
     <ClInclude Include="floating_point.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hidden_layer_1_biases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hidden_layer_1_weights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hidden_layer_2_biases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hidden_layer_2_weights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="output_layer_biases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="output_layer_weights.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

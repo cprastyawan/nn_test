@@ -6,17 +6,12 @@
 
 typedef struct _neuron {
 	floating_point* actv;
-	floating_point* dactv;
 
 	floating_point* z;
-	floating_point* dz;
 
 	floating_point* bias;
-	floating_point** weights;
+	floating_point* weights;
 
-	floating_point* dbias;
-
-	floating_point** dweights;
 	uint16_t numOfNeurons;
 } neuron_t;
 

@@ -6,7 +6,7 @@ static void f_relu(floating_point* input, floating_point* output, uint16_t size)
 	while (size--) {
 		floating_point vInput = *(input++);
 
-		*(output++) = (vInput) > 0.0 ? (vInput) : 0.0;
+		*(output++) = (vInput) > 0.0f ? (vInput) : 0.0f;
 	}
 	
 	return;
@@ -36,7 +36,7 @@ static floating_point _expo(floating_point input) {
 
 static void d_relu(floating_point* input, floating_point* output, uint16_t size) {
 	while (size--) {
-		*(output++) = *(input++) > 0.0 ? 1 : 0.0;
+		*(output++) = *(input++) > 0.0f ? 1 : 0.0f;
 	}
 
 	return;
@@ -44,7 +44,7 @@ static void d_relu(floating_point* input, floating_point* output, uint16_t size)
 
 static void f_sigmoid(floating_point* input, floating_point* output, uint16_t size) {
 	while (size--) {
-		*(output++) = (1.0 / (1.0 + _expo(-(*(input++)))));
+		*(output++) = (1.0f / (1.0f + _expo(-(*(input++)))));
 	}
 	
 	return;
@@ -129,7 +129,7 @@ static void d_tanh(floating_point* input, floating_point* output, uint16_t size)
 	while (size--) {
 		floating_point vInput = *output;
 
-		*(output++) = 1 - pow(vInput, 2);
+		*(output++) = 1 - powf(vInput, 2);
 	}
 
 	return;

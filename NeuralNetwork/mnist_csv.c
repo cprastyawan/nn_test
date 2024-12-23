@@ -57,7 +57,7 @@ static void parse_mnist_line(csvparser_t* parser, mnist_data_t* out) {
 	out->label = atoi(parser->parsed_buffer[0]);
 
 	for (uint16_t i = 0; i < (28 * 28); i++) {
-		out->data[i] = (floating_point)atoi(parser->parsed_buffer[i + 1]) / 255.0;
+		out->data[i] = (floating_point)atoi(parser->parsed_buffer[i + 1]) / 255.0f;
 	}
 
 	return;

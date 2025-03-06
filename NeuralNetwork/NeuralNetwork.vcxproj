@@ -128,6 +128,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="activation_function.c" />
+    <ClCompile Include="csvparser.c" />
+    <ClCompile Include="iris.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mnist_csv.c" />
     <ClCompile Include="neuralnetwork.c" />
@@ -135,11 +137,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="activation_function.h" />
+    <ClInclude Include="csvparser.h" />
     <ClInclude Include="floating_point.h" />
     <ClInclude Include="hidden_layer_1_biases.h" />
     <ClInclude Include="hidden_layer_1_weights.h" />
     <ClInclude Include="hidden_layer_2_biases.h" />
     <ClInclude Include="hidden_layer_2_weights.h" />
+    <ClInclude Include="iris.h" />
     <ClInclude Include="mnist_csv.h" />
     <ClInclude Include="neuralnetwork.h" />
     <ClInclude Include="output_layer_biases.h" />

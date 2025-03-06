@@ -20,6 +20,8 @@
 #include "output_layer_biases.h"
 #include "output_layer_weights.h"
 
+#include "iris.h"
+
 extern uint64_t ns();
 
 csvparser_t parser;
@@ -30,10 +32,25 @@ static const char* filename_train = "dataset/mnist_train.csv";
 //floating_point* softmax_param_pz;
 //uint16_t* softmax_param_num_neurons;
 
-void mnist_getDesiredOutput(uint8_t label, floating_point* desiredOutput) {
+static void mnist_getDesiredOutput(uint8_t label, floating_point* desiredOutput) {
 	for (uint8_t i = 0; i < 10; i++) {
 		desiredOutput[i] = label == i ? 1.0f : 0.0f;
 	}
+
+	return;
+}
+
+static void mnist_datatobinaryfile(mnist_data_t* input, uint16_t size) {
+	uint16_t index = 0;// rand() % size;
+	FILE* p = fopen("test.bin", "wb");
+	FILE* txt = fopen("test.txt", "w");
+	char label = input[index].label + '0';
+
+	fwrite(input[index].data, 784, 4, p);
+	fclose(p);
+
+	fwrite(&label, 1, 1, txt);
+	fclose(txt);
 
 	return;
 }
@@ -53,6 +70,17 @@ static uint8_t mnist_correct(uint8_t label, floating_point* actv) {
 	return label == maxIdx ? 1 : 0;
 }
 
+int main() {
+	iris_init();
+
+	iris_shuffle();
+
+	iris_run();
+
+	return 0;
+}
+
+/*
 int main() {
 #define NUMOFLAYERS 4
 	neuralnetwork_t serigala;
@@ -82,6 +110,10 @@ int main() {
 	mnist_parse(&parser, mnist_out, MNIST_TESTSIZE);
 
 	fclose(parser.fp);
+
+	//mnist_datatobinaryfile(mnist_out, MNIST_TESTSIZE);
+
+	//return;
 
 	mnist_shuffle(mnist_out, MNIST_TESTSIZE);
 
@@ -115,4 +147,4 @@ int main() {
 	printf("Total Correct : %d, Accuracy: %f\r\n", numCorrect, accuracy);
 
 	return 0;
-}
+}*/

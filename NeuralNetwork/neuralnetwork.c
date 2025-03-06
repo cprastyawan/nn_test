@@ -43,18 +43,16 @@ static void _neuralnetwork_initLayer(layer_t* layer, uint16_t numOfNeurons,
 	if (prevLayer == NULL || activation == NULL) {
 		layer->neurons.weights = NULL;
 		layer->neurons.bias = NULL;
-		layer->neurons.z = NULL;
 	}
 	else {
 		prevLayer->next = layer;
+		layer->activation = *activation;
 	}
 
-	layer->neurons.numOfNeurons = numOfNeurons;
 	layer->neurons.actv = malloc(sizeof(floating_point) * numOfNeurons);
 
-	layer->neurons.z = malloc(sizeof(floating_point) * numOfNeurons);
+	layer->neurons.numOfNeurons = numOfNeurons;
 
-	layer->activation = activation;
 	layer->prev = prevLayer;
 	layer->next = NULL;
 
@@ -165,13 +163,13 @@ uint8_t neuralnetwork_feedforward(neuralnetwork_t* nn) {
 	layer_t* pLayer = nn->inputLayer;
 
 	while (pLayer->next != NULL) {
-		matvecmult(pLayer->next->neurons.weights, pLayer->neurons.actv, pLayer->next->neurons.z,
+		matvecmult(pLayer->next->neurons.weights, pLayer->neurons.actv, pLayer->next->neurons.actv,
 			pLayer->next->neurons.numOfNeurons, pLayer->neurons.numOfNeurons);
 
-		vecsadd(pLayer->next->neurons.z, pLayer->next->neurons.bias,
+		vecsadd(pLayer->next->neurons.actv, pLayer->next->neurons.bias,
 			pLayer->next->neurons.actv, pLayer->next->neurons.numOfNeurons);
 
-		pLayer->next->activation->function(pLayer->next->neurons.actv, pLayer->next->neurons.actv,
+		pLayer->next->activation.function(pLayer->next->neurons.actv, pLayer->next->neurons.actv,
 			pLayer->next->neurons.numOfNeurons);
 
 		pLayer = pLayer->next;

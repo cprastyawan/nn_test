@@ -1,0 +1,12 @@
+bin2header -o hidden_layer_1_weights.h -e -p 32 -d 784 weights_input_layer_to_hidden_layer_1
+bin2header -o hidden_layer_1_biases.h -e -p 32 -d 20 biases_input_layer_to_hidden_layer_1
+
+
+
+bin2header -o hidden_layer_2_weights.h -e -p 32 -d 20 weights_hidden_layer_1_to_hidden_layer_2
+bin2header -o hidden_layer_2_biases.h -e -p 32 -d 20 biases_hidden_layer_1_to_hidden_layer_2
+
+
+
+bin2header -o output_layer_weights.h -e -p 32 -d 20 weights_hidden_layer_2_to_output_layer
+bin2header -o output_layer_biases.h -e -p 32 -d 10 biases_hidden_layer_2_to_output_layer

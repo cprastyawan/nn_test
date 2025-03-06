@@ -30,6 +30,12 @@
     <ClCompile Include="activation_function.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="csvparser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="iris.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mnist_csv.h">
@@ -60,6 +66,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="output_layer_weights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iris.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="csvparser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

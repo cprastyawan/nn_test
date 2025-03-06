@@ -7,8 +7,6 @@
 typedef struct _neuron {
 	floating_point* actv;
 
-	floating_point* z;
-
 	floating_point* bias;
 	floating_point* weights;
 
@@ -18,7 +16,7 @@ typedef struct _neuron {
 typedef struct _layer {
 	char name[32];
 	neuron_t neurons;
-	activation_t* activation;
+	activation_t activation;
 	struct _layer* next;
 	struct _layer* prev;
 } layer_t;
